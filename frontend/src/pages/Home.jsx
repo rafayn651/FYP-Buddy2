@@ -1,5 +1,7 @@
 import React from 'react'
-import Navbar from '../components/navbar'
+import Navbar from "../components/Navbar";
+
+
 import HeroSection from '../components/Hero'
 import Features from '@/components/features'
 import PortalsSection from '@/components/PortalsSection'
