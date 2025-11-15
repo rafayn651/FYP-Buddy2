@@ -33,7 +33,8 @@ import {
   Settings,
 } from "lucide-react";
 import { FaTasks } from "react-icons/fa";
-import ResponsiveMenu from "./responsivemenu";
+import ResponsiveMenu from './ResponsiveMenu';
+
 import LoginPage from "./Login";
 import { toggleTheme } from "@/redux/themeSlice";
 import { useDispatch, useSelector } from "react-redux";
