@@ -253,25 +253,33 @@ export const registerChatGateway = (io) => {
       try {
         const { to, roomKey, offer } = payload || {};
         if (!to || !roomKey || !offer) {
+          console.error(`[RTC:OFFER] Invalid payload from user ${socket.user.id}`);
           callback?.({ success: false, message: "Invalid payload" });
           return;
         }
         const allowedRoom = socket.data.rooms?.find((room) => room.id === roomKey);
         if (!allowedRoom) {
+          console.error(`[RTC:OFFER] Room ${roomKey} not allowed for user ${socket.user.id}`);
           callback?.({ success: false, message: "Room not allowed" });
           return;
         }
         const participantIds = allowedRoom.participantIds || [];
         if (!participantIds.map(String).includes(String(to))) {
+          console.error(`[RTC:OFFER] Target ${to} not in room ${roomKey}`);
           callback?.({ success: false, message: "Target not in room" });
           return;
         }
         const toSocketId = onlineUsers.get(String(to));
         if (toSocketId) {
+          console.log(`[RTC:OFFER] Forwarding offer from ${socket.user.id} to ${to} in room ${roomKey}`);
           socket.to(toSocketId).emit("rtc:offer", { from: socket.user.id, roomKey, offer });
+          callback?.({ success: true });
+        } else {
+          console.warn(`[RTC:OFFER] Target user ${to} is not online`);
+          callback?.({ success: false, message: "Target user is not online" });
         }
-        callback?.({ success: true });
       } catch (error) {
+        console.error(`[RTC:OFFER] Error:`, error);
         callback?.({ success: false, message: "Failed to forward offer" });
       }
     });
@@ -280,25 +288,33 @@ export const registerChatGateway = (io) => {
       try {
         const { to, roomKey, answer } = payload || {};
         if (!to || !roomKey || !answer) {
+          console.error(`[RTC:ANSWER] Invalid payload from user ${socket.user.id}`);
           callback?.({ success: false, message: "Invalid payload" });
           return;
         }
         const allowedRoom = socket.data.rooms?.find((room) => room.id === roomKey);
         if (!allowedRoom) {
+          console.error(`[RTC:ANSWER] Room ${roomKey} not allowed for user ${socket.user.id}`);
           callback?.({ success: false, message: "Room not allowed" });
           return;
         }
         const participantIds = allowedRoom.participantIds || [];
         if (!participantIds.map(String).includes(String(to))) {
+          console.error(`[RTC:ANSWER] Target ${to} not in room ${roomKey}`);
           callback?.({ success: false, message: "Target not in room" });
           return;
         }
         const toSocketId = onlineUsers.get(String(to));
         if (toSocketId) {
+          console.log(`[RTC:ANSWER] Forwarding answer from ${socket.user.id} to ${to} in room ${roomKey}`);
           socket.to(toSocketId).emit("rtc:answer", { from: socket.user.id, roomKey, answer });
+          callback?.({ success: true });
+        } else {
+          console.warn(`[RTC:ANSWER] Target user ${to} is not online`);
+          callback?.({ success: false, message: "Target user is not online" });
         }
-        callback?.({ success: true });
       } catch (error) {
+        console.error(`[RTC:ANSWER] Error:`, error);
         callback?.({ success: false, message: "Failed to forward answer" });
       }
     });
@@ -323,9 +339,12 @@ export const registerChatGateway = (io) => {
         const toSocketId = onlineUsers.get(String(to));
         if (toSocketId) {
           socket.to(toSocketId).emit("rtc:candidate", { from: socket.user.id, roomKey, candidate });
+          callback?.({ success: true });
+        } else {
+          callback?.({ success: false, message: "Target user is not online" });
         }
-        callback?.({ success: true });
       } catch (error) {
+        console.error(`[RTC:CANDIDATE] Error:`, error);
         callback?.({ success: false, message: "Failed to forward candidate" });
       }
     });
@@ -349,10 +368,15 @@ export const registerChatGateway = (io) => {
         }
         const toSocketId = onlineUsers.get(String(to));
         if (toSocketId) {
+          console.log(`[RTC:END] Forwarding end call from ${socket.user.id} to ${to} in room ${roomKey}`);
           socket.to(toSocketId).emit("rtc:end", { from: socket.user.id, roomKey });
+          callback?.({ success: true });
+        } else {
+          console.warn(`[RTC:END] Target user ${to} is not online`);
+          callback?.({ success: false, message: "Target user is not online" });
         }
-        callback?.({ success: true });
       } catch (error) {
+        console.error(`[RTC:END] Error:`, error);
         callback?.({ success: false, message: "Failed to forward end" });
       }
     });
@@ -361,25 +385,33 @@ export const registerChatGateway = (io) => {
       try {
         const { to, roomKey } = payload || {};
         if (!to || !roomKey) {
+          console.error(`[RTC:RING] Invalid payload from user ${socket.user.id}`);
           callback?.({ success: false, message: "Invalid payload" });
           return;
         }
         const allowedRoom = socket.data.rooms?.find((room) => room.id === roomKey);
         if (!allowedRoom) {
+          console.error(`[RTC:RING] Room ${roomKey} not allowed for user ${socket.user.id}`);
           callback?.({ success: false, message: "Room not allowed" });
           return;
         }
         const participantIds = allowedRoom.participantIds || [];
         if (!participantIds.map(String).includes(String(to))) {
+          console.error(`[RTC:RING] Target ${to} not in room ${roomKey}`);
           callback?.({ success: false, message: "Target not in room" });
           return;
         }
         const toSocketId = onlineUsers.get(String(to));
         if (toSocketId) {
+          console.log(`[RTC:RING] Forwarding ring from ${socket.user.id} to ${to} in room ${roomKey}`);
           socket.to(toSocketId).emit("rtc:ring", { from: socket.user.id, roomKey });
+          callback?.({ success: true });
+        } else {
+          console.warn(`[RTC:RING] Target user ${to} is not online`);
+          callback?.({ success: false, message: "Target user is not online" });
         }
-        callback?.({ success: true });
       } catch (error) {
+        console.error(`[RTC:RING] Error:`, error);
         callback?.({ success: false, message: "Failed to forward ring" });
       }
     });
@@ -388,25 +420,33 @@ export const registerChatGateway = (io) => {
       try {
         const { to, roomKey } = payload || {};
         if (!to || !roomKey) {
+          console.error(`[RTC:RING:ACCEPT] Invalid payload from user ${socket.user.id}`);
           callback?.({ success: false, message: "Invalid payload" });
           return;
         }
         const allowedRoom = socket.data.rooms?.find((room) => room.id === roomKey);
         if (!allowedRoom) {
+          console.error(`[RTC:RING:ACCEPT] Room ${roomKey} not allowed for user ${socket.user.id}`);
           callback?.({ success: false, message: "Room not allowed" });
           return;
         }
         const participantIds = allowedRoom.participantIds || [];
         if (!participantIds.map(String).includes(String(to))) {
+          console.error(`[RTC:RING:ACCEPT] Target ${to} not in room ${roomKey}`);
           callback?.({ success: false, message: "Target not in room" });
           return;
         }
         const toSocketId = onlineUsers.get(String(to));
         if (toSocketId) {
+          console.log(`[RTC:RING:ACCEPT] Forwarding accept from ${socket.user.id} to ${to} in room ${roomKey}`);
           socket.to(toSocketId).emit("rtc:ring:accept", { from: socket.user.id, roomKey });
+          callback?.({ success: true });
+        } else {
+          console.warn(`[RTC:RING:ACCEPT] Target user ${to} is not online`);
+          callback?.({ success: false, message: "Target user is not online" });
         }
-        callback?.({ success: true });
       } catch (error) {
+        console.error(`[RTC:RING:ACCEPT] Error:`, error);
         callback?.({ success: false, message: "Failed to forward ring accept" });
       }
     });
@@ -415,25 +455,33 @@ export const registerChatGateway = (io) => {
       try {
         const { to, roomKey } = payload || {};
         if (!to || !roomKey) {
+          console.error(`[RTC:RING:DECLINE] Invalid payload from user ${socket.user.id}`);
           callback?.({ success: false, message: "Invalid payload" });
           return;
         }
         const allowedRoom = socket.data.rooms?.find((room) => room.id === roomKey);
         if (!allowedRoom) {
+          console.error(`[RTC:RING:DECLINE] Room ${roomKey} not allowed for user ${socket.user.id}`);
           callback?.({ success: false, message: "Room not allowed" });
           return;
         }
         const participantIds = allowedRoom.participantIds || [];
         if (!participantIds.map(String).includes(String(to))) {
+          console.error(`[RTC:RING:DECLINE] Target ${to} not in room ${roomKey}`);
           callback?.({ success: false, message: "Target not in room" });
           return;
         }
         const toSocketId = onlineUsers.get(String(to));
         if (toSocketId) {
+          console.log(`[RTC:RING:DECLINE] Forwarding decline from ${socket.user.id} to ${to} in room ${roomKey}`);
           socket.to(toSocketId).emit("rtc:ring:decline", { from: socket.user.id, roomKey });
+          callback?.({ success: true });
+        } else {
+          console.warn(`[RTC:RING:DECLINE] Target user ${to} is not online`);
+          callback?.({ success: false, message: "Target user is not online" });
         }
-        callback?.({ success: true });
       } catch (error) {
+        console.error(`[RTC:RING:DECLINE] Error:`, error);
         callback?.({ success: false, message: "Failed to forward ring decline" });
       }
     });
