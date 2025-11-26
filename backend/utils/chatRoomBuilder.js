@@ -118,6 +118,53 @@ export const buildUserRooms = async (userId) => {
     }
   }
 
+  if (user.role === "supervisor") {
+    const supervisedGroups = await Group.find({ supervisor: userId })
+      .populate({
+        path: "members",
+        select: "username profilePic role",
+      })
+      .populate({
+        path: "supervisor",
+        select: "username profilePic role",
+      })
+      .lean();
+
+    for (const group of supervisedGroups) {
+      const groupMembers = (group.members || []).map(formatUser).filter(Boolean);
+      const supervisor = formatUser(group.supervisor);
+
+      // Direct chats with students
+      groupMembers.forEach((member) => {
+        const directKey = buildDirectRoomKey(currentUser.id, member.id);
+        // Check if room already exists (e.g. if student is in multiple groups supervised by same person - unlikely but possible)
+        if (!rooms.some(r => r.id === directKey)) {
+          rooms.push({
+            id: directKey,
+            type: "individual",
+            name: `${member.username} (${group.groupName})`,
+            participant: member,
+            participants: [member, currentUser],
+            participantIds: [member.id, currentUser.id],
+            meta: { scope: "student", groupName: group.groupName },
+          });
+        }
+      });
+
+      // Group chat (With Supervisor)
+      const groupWithSupervisor = [...groupMembers, supervisor].filter(Boolean);
+      rooms.push({
+        id: `group-supervisor-${group._id}`,
+        type: "group",
+        name: `${group.groupName} (With Supervisor)`,
+        groupId: group._id.toString(),
+        participants: groupWithSupervisor,
+        participantIds: groupWithSupervisor.map((p) => p.id),
+        meta: { scope: "withSupervisor" },
+      });
+    }
+  }
+
   rooms.push({
     id: "public-chat",
     type: "public",
@@ -131,9 +178,9 @@ export const buildUserRooms = async (userId) => {
     user: currentUser,
     group: groupDetails
       ? {
-          id: groupDetails._id.toString(),
-          groupName: groupDetails.groupName,
-        }
+        id: groupDetails._id.toString(),
+        groupName: groupDetails.groupName,
+      }
       : null,
     rooms,
   };

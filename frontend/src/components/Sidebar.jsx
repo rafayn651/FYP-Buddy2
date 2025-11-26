@@ -39,6 +39,7 @@ const Sidebar = ({ portalType }) => {
     supervisor: [
       { label: "Dashboard", path: "/supervisor/dashboard", icon: LayoutDashboard },
       { label: "My Groups", path: "/supervisor/my-groups", icon: Users },
+      { label: "Team Chat", path: "/supervisor/team-chat", icon: MessageCircle },
       { label: "Manage Tasks", path: "/supervisor/manage-tasks", icon: FaTasks },
       { label: "Grading", path: "/supervisor/grading", icon: GraduationCap },
       { label: "Profile", path: "/supervisor/profile", icon: User },

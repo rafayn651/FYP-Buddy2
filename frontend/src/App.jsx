@@ -24,6 +24,7 @@ import Supervisionrequests from './pages/supervisor/SupervisionRequests'
 import MyGroups from './pages/supervisor/MyGroups'
 import TaskManagement from './pages/supervisor/ManageTasks'
 import SupervisorGrading from './pages/supervisor/Grading'
+import SupervisorTeamChat from './pages/supervisor/TeamChat'
 // Coordinator
 import CoordinatorDashboard from './pages/coordinator/Dashboard'
 import CoordinatorMilestones from './pages/coordinator/Milestones'
@@ -80,6 +81,7 @@ const router = createBrowserRouter([
       { path: "my-groups", element: <MyGroups /> },
       { path: "manage-tasks", element: <TaskManagement /> },
       { path: "grading", element: <SupervisorGrading /> },
+      { path: "team-chat", element: <SupervisorTeamChat /> },
       { path: "profile", element: <ProfilePage /> }
     ]
   },
@@ -97,7 +99,7 @@ const router = createBrowserRouter([
     ]
   },
 
-  { path: "/unauthorized", element:<UnauthorizedPage/>  }
+  { path: "/unauthorized", element: <UnauthorizedPage /> }
 ])
 
 const App = () => <RouterProvider router={router} />
